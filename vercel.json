@@ -5,34 +5,26 @@
       "src": "frontend/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "build"
+        "distDir": "build",
+        "nodeVersion": "18.x"
       }
     },
     {
       "src": "backend/src/index.ts",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "python-service/app.py",
-      "use": "@vercel/python"
+      "use": "@vercel/node",
+      "config": {
+        "nodeVersion": "18.x"
+      }
     }
   ],
   "routes": [
-    {
-      "src": "/api/python/(.*)",
-      "dest": "python-service/app.py"
-    },
     {
       "src": "/api/(.*)",
       "dest": "backend/src/index.ts"
     },
     {
-      "src": "/static/(.*)",
-      "dest": "frontend/build/static/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "frontend/build/index.html"
+      "dest": "frontend/package.json"
     }
   ]
 }
