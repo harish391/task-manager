@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:frontend",
   "builds": [
     {
       "src": "frontend/package.json",
@@ -28,8 +27,12 @@
       "dest": "backend/src/index.ts"
     },
     {
+      "src": "/static/(.*)",
+      "dest": "frontend/build/static/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "frontend/package.json"
+      "dest": "frontend/build/index.html"
     }
   ]
 }
