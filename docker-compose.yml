@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: task-manager-mongodb
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - task-manager-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: task-manager-backend
+    ports:
+      - '5000:5000'
+    environment:
+      MONGODB_URI: mongodb://root:password@mongodb:27017/task-manager?authSource=admin
+      JWT_SECRET: your_jwt_secret_change_in_production
+      NODE_ENV: development
+    depends_on:
+      - mongodb
+    networks:
+      - task-manager-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: task-manager-frontend
+    ports:
+      - '3000:3000'
+    environment:
+      REACT_APP_API_URL: http://localhost:5000/api
+    depends_on:
+      - backend
+    networks:
+      - task-manager-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  python-service:
+    build:
+      context: ./python-service
+      dockerfile: Dockerfile
+    container_name: task-manager-python
+    ports:
+      - '8000:8000'
+    environment:
+      BACKEND_URL: http://backend:5000
+      FLASK_ENV: development
+    depends_on:
+      - backend
+    networks:
+      - task-manager-network
+    volumes:
+      - ./python-service:/app
+
+volumes:
+  mongodb_data:
+
+networks:
+  task-manager-network:
+    driver: bridge
